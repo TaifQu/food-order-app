@@ -1,0 +1,8 @@
+{
+  "name": "Food Order Menu Management System (SEP-G1)",
+  "description": "Full-stack Food Ordering System with interactive menu, live kitchen tracking, Prometheus telemetry, and Dockerized DevOps pipeline for Group SEP-G1.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

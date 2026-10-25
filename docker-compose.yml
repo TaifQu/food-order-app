@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # 1. Main Food Ordering Application Container
+  food-order-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: food-order-service
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+    networks:
+      - food-order-net
+
+  # 2. Prometheus Metrics Monitoring Engine
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: prometheus-food-orders
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    depends_on:
+      - food-order-app
+    networks:
+      - food-order-net
+
+  # 3. Grafana Analytics & Metrics Dashboard
+  grafana:
+    image: grafana/grafana:10.4.0
+    container_name: grafana-food-orders
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+    networks:
+      - food-order-net
+
+networks:
+  food-order-net:
+    driver: bridge
